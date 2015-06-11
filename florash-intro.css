@@ -1,0 +1,119 @@
+/* apply a natural box layout model to all elements, but allowing components to change */
+
+html {
+    box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
+}
+
+body {
+    min-width: 720px;
+    overflow: auto;
+    margin: 0;
+    padding: 0 0 40vh 0;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1.7rem;
+    font-weight: 300;
+}
+
+h1,
+h2,
+h3 {
+    text-transform: uppercase;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 300;
+}
+
+pre,
+code,
+samp {
+    font-family: 'Source Code Pro';
+    font-weight: 600;
+    color: #069;
+}
+
+a {
+    color: #f60;
+    font-weight: 400;
+}
+
+#intro {
+    display: block;
+    width: 80vw;
+    min-height: 80vh;
+    margin-left: 10vw;
+    margin-top: 10vh;
+    padding-top: ;
+    background-repeat: no-repeat;
+    background-position: center 0;
+    background-size: 60vh;
+    padding-top: 60vh;
+    text-align: center;
+}
+
+#intro dfn {
+    color: #069;
+    font-weight: 400;
+    font-style: normal;
+}
+
+#intro h1 {
+    color: #069;
+    font-weight: 400;
+}
+
+main {
+    width: 80vw;
+    margin-left: 10vw;
+    text-align: center;
+}
+
+form {
+    display: block;
+    background: #ccc;
+    padding: 1rem;
+    position: relative;
+    text-align: left;
+    min-height: calc(256px + 2rem);
+}
+
+th {
+    font-size: 1rem;
+    color: #999;
+}
+
+form label,
+form input {
+    width: 50%;
+    margin-right: 50%;
+}
+
+form input {
+    font-size: 1.5rem;
+    padding: .5rem;
+    margin-top: 1rem;
+}
+
+form img {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 256px;
+    height: 256px;
+    border: 0;
+    background: #fff;
+}
+
+ul {
+    list-style-type: none;
+    text-align: left;
+}
+
+li b {
+    width: 5em;
+    display: inline-block;
+}
