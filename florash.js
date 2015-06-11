@@ -1,8 +1,8 @@
 "use strict";
 
-(function(main) {
+(function() {
 
-
+    var main = this;
     var TWO_PI = Math.PI * 2;
     var PHI = ((1 + Math.sqrt(5)) / 2);
 
