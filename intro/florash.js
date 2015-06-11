@@ -1,138 +1,264 @@
 "use strict";
-(function(t) {
-    var n = 2 * Math.PI,
-        a = (1 + Math.sqrt(5)) / 2,
-        e = function(t, n, a) {
-            var e = "hsl(" + Math.floor(t) % 360 + "," + (100 - n % 100) + "%," + (100 - a % 100) + "%)";
-            return e
-        },
-        r = function(t) {
-            return t.match(/\w\w/g).reduce(function(t, n) {
-                return 1 * (t || 0) + parseInt(n, 16)
-            })
-        },
-        s = function(t) {
-            var n = r(t),
-                a = 360 * n / (255 * (t.length / 2)),
-                e = 360 * (a + n / Math.PI);
-            return e
-        },
-        i = function(t) {
-            for (var n = t.match(/\w\w/g).map(function(t) {
-                    return parseInt(t, 16) / 255
-                }), a = []; a.length < t.length / 8;) {
-                for (var e = []; e.length < 4;) e.push(n.shift());
-                a.push(e)
+
+(function(main) {
+
+    var main = this;
+    var TWO_PI = Math.PI * 2;
+    var PHI = ((1 + Math.sqrt(5)) / 2);
+
+
+    var createHSLString = function(h, s, l) {
+        var hsl = 'hsl(' + (Math.floor(h) % 360) + ',' + (100 - (s % 100)) + '%,' + (100 - (l % 100)) + '%)';
+        return hsl;
+    };
+    var hashSum = function(hash) {
+        return hash.match(/\w\w/g).reduce(function(s, h) {
+            return 1 * (s || 0) + parseInt(h, 16);
+        });
+    };
+    var hashAvg = function(hash) {
+        return hashSum(hash) / (hash.length / 2);
+    };
+
+    var getHashColor = function(hash) {
+        // The purpose of this function is to add drastic 
+        // visible color differentiation for sequential 
+        // or sequentially similar sha1 hex strings.
+        // ie: 
+        //  0000000000000000000000000000000000000001 == green
+        //  0000000000000000000000000000000000000002 == purple
+        //  0000000000000000000000000000000000000003 == yellow
+        // or
+        // d3b4fec8ac70c97310bcf044e5277e9c98dfe318 === green
+        // d3b4fec8ac70c97310bcff44e5277e9c98dfe317 === red
+        // fffffec8ac70c97310bcf044e5277e9c98dfe317 === red 
+        // (other factors of the script modify shape of chunks to distinguish between last two hashes in last examples)
+        var sum = hashSum(hash);
+        var initialHue = (sum * 360) / (255 * (hash.length / 2));
+        var offsetHue = (initialHue + (sum / Math.PI)) * 360;
+        return offsetHue;
+    };
+
+    var createHashParameters = function(hash) {
+        // Derives parameters m, n1, n2, n3 from hash values;
+        var flts = hash.match(/\w\w/g).map(function(h) {
+            return parseInt(h, 16) / 255;
+        });
+        var groups = [];
+        while (groups.length < hash.length / 8) {
+            var group = [];
+            while (group.length < 4) {
+                group.push(flts.shift());
             }
-            return a.map(function(n, e) {
-                var r, s, i, o, h = Math.floor(360 * n[0]),
-                    u = Math.floor(360 * n[1]),
-                    c = t.length / n.length;
-                r = 2 * c - (n[0] * c + e);
-                var l = {
-                    fill: (h + 360 / a.length * e) % 360,
-                    stroke: u,
-                    m: r - r % (e + 2),
-                    n1: s = Math.SQRT1_2 + n[1],
-                    n2: i = Math.SQRT1_2 + n[2],
-                    n3: o = Math.SQRT1_2 + n[3]
-                };
-                return l
-            })
-        },
-        o = function(t, n, a, e, r, s) {
-            return this.a = t || 1, this.b = n || 1, this.m = a || 1, this.n1 = e || 1, this.n2 = r || 1, this.n3 = s || 1, this
-        };
-    o.prototype.map = function(t) {
-        var a, e, r, s, i, o, h, u, c, l, f;
-        r = this.m, s = this.n1, i = this.n2, o = this.n3, a = this.a, e = this.b, h = u = c = l = 0;
-        for (var v = []; n >= u;) {
-            f = r * u / 4, h = Math.pow(Math.pow(Math.abs(Math.cos(f) / a), i) + Math.pow(Math.abs(Math.sin(f) / e), o), -1 / s), c = h * Math.cos(u), l = h * Math.sin(u), u += .01;
-            var p = t.call(null, c, l);
-            v.push(p)
+            groups.push(group);
         }
-        return v
+
+        return groups.map(function(group, index) {
+
+            var fillHue = Math.floor(group[0] * 360);
+            var strokeHue = Math.floor(group[1] * 360);
+            var m, n1, n2, n3;
+            var n = hash.length / group.length;
+            m = n * 2 - (group[0] * n + index);
+
+            var params = {
+                fill: (fillHue + ((360 / groups.length) * index)) % 360,
+                stroke: strokeHue,
+                m: m - m % (index + 2),
+                n1: n1 = Math.SQRT1_2 + group[1],
+                n2: n2 = Math.SQRT1_2 + group[2],
+                n3: n3 = Math.SQRT1_2 + group[3],
+            };
+
+            return params;
+        });
     };
-    var h = function(t, n) {
-        var a = t.canvas || document.createElement("canvas");
-        t instanceof Array ? (n = t, t = {}) : (t = t || {}, n = n || []), t.canvas || (a.width = t.size || (t.size = 256), a.height = t.size);
-        var e = a.getContext("2d");
-        return e.lineJoin = "round", e.lineCap = "round", e.lineWidth = t.line || (t.line = 8), e.strokeStyle = t.stroke || (t.stroke = "#222"), e.fillStyle = t.fill || (t.fill = "#AAA"), e.moveTo(n[n.length - 1].x, n[n.length - 1].y), e.beginPath(), n.forEach(function(t) {
-            e.lineTo(t.x, t.y)
-        }), e.closePath(), e.fill(), e.stroke(), this.options = t, this.points = n, this.canvas = a, this
+
+    var SuperFormula = function(a, b, m, n1, n2, n3) {
+        this.a = a || 1;
+        this.b = b || 1;
+        this.m = m || 1;
+        this.n1 = n1 || 1;
+        this.n2 = n2 || 1;
+        this.n3 = n3 || 1;
+        return this;
     };
-    h.prototype = {
-        toDataURL: function(t) {
-            return t = t || "image/png", this.canvas.toDataURL(t)
+
+    SuperFormula.prototype.map = function(fn) {
+        var a, b, m, n1, n2, n3, r, p, xp, yp, ang;
+        m = this.m, n1 = this.n1, n2 = this.n2, n3 = this.n3;
+        a = this.a;
+        b = this.b;
+        r = p = xp = yp = 0;
+        var output = [];
+        while (p <= TWO_PI) {
+            ang = m * p / 4;
+            r = Math.pow(Math.pow(Math.abs(Math.cos(ang) / a), n2) + Math.pow(Math.abs(Math.sin(ang) / b), n3), -1 / n1);
+            xp = r * Math.cos(p);
+            yp = r * Math.sin(p);
+            p += 0.01;
+            var point = fn.call(null, xp, yp);
+            output.push(point);
+        }
+        return output;
+    };
+
+    var ShapeRenderer = function(options, points) {
+        var canvas = options.canvas || document.createElement('canvas');
+        if (options instanceof Array) {
+            points = options;
+            options = {};
+        } else {
+            options = options || {};
+            points = points || [];
+        }
+        if (!options.canvas) {
+            canvas.width = options.size || (options.size = 256);
+            canvas.height = options.size;
+        }
+        var context = canvas.getContext('2d');
+        context.lineJoin = 'round';
+        context.lineCap = 'round';
+        context.lineWidth = options.line || (options.line = 8);
+        context.strokeStyle = options.stroke || (options.stroke = '#222');
+        context.fillStyle = options.fill || (options.fill = '#AAA');
+        context.moveTo(points[points.length - 1].x, points[points.length - 1].y);
+        context.beginPath();
+        points.forEach(function(point) {
+            context.lineTo(point.x, point.y);
+        });
+        context.closePath();
+        context.fill();
+        context.stroke();
+        this.options = options;
+        this.points = points;
+        this.canvas = canvas;
+        return this;
+    };
+
+    ShapeRenderer.prototype = {
+        toDataURL: function(type) {
+            type = type || 'image/png';
+            return this.canvas.toDataURL(type);
         },
         toImage: function() {
-            var t = new l;
-            return t.src = this.toDataURL(), t
+            var image = Florash.createImage();
+            image.src = this.toDataURL();
+            return image;
         },
         toCanvas: function() {
-            return this.canvas
+            return this.canvas;
         },
         toImageData: function() {
-            var t = this.canvas.getContext("2d"),
-                n = t.getImageData(0, 0, this.options.size, this.options.size);
-            return n
+            var context = this.canvas.getContext('2d');
+            var imageData = context.getImageData(0, 0, this.options.size, this.options.size);
+            return imageData;
         }
     };
-    var u = function(t, n) {
-        var c = n.size || 256,
-            l = Math.floor(c / 2),
-            f = Math.floor(a / 100 * c),
-            v = Math.floor(c / 2 - f);
-        this.hash = t, this.sum = r(t), this.mainHue = s(t), this.parameters = i(t), this.shapes = this.parameters.map(function(t, n) {
-            var a = {
-                    fill: e(t.fill + this.mainHue, 100, 66),
-                    stroke: e(t.stroke + this.mainHue, 100, 22 + 11 * n),
-                    line: f,
-                    size: c
-                },
-                r = new o(1, 1, t.m, t.n1, t.n2, t.n3),
-                s = r.map(function(t, n) {
-                    return {
-                        x: l + t * v,
-                        y: l + n * v
-                    }
-                });
-            return f *= Math.LOG2E, new h(a, s)
+
+    var Florash = function(hash, options) {
+        var size = options.size || 256;
+        var center = Math.floor(size / 2);
+        var line = Math.floor((PHI / 100) * size);
+        var scale = Math.floor((size / 2) - line);
+
+
+        this.hash = hash;
+        this.sum = hashSum(hash);
+        this.mainHue = getHashColor(hash);
+        this.parameters = createHashParameters(hash);
+        this.shapes = this.parameters.map(function(params, index) {
+            var settings = {
+                fill: createHSLString(params.fill + this.mainHue, 100, 66),
+                stroke: createHSLString(params.stroke + this.mainHue, 100, 22 + (11 * index)),
+                line: line,
+                size: size
+            };
+            var formula = new SuperFormula(1, 1, params.m, params.n1, params.n2, params.n3);
+            var points = formula.map(function(x, y) {
+                return {
+                    x: center + x * scale,
+                    y: center + y * scale
+                };
+            });
+            line *= Math.LOG2E;
+            return new ShapeRenderer(settings, points);
         }, this);
-        for (var p = u.createCanvas(c, c), m = p.getContext("2d"), g = 0, d = c / this.shapes.length, M = 0, w = this.shapes.length; w > M; M++) {
-            var y = this.shapes[M];
-            m.drawImage(y.toImage(), g, g, c, c), c -= d, g += Math.floor(d / 2)
+
+        var canvas = Florash.createCanvas(size, size);
+        var context = canvas.getContext('2d');
+        //context.globalCompositeOperation = 'hard-light';
+        var offset = 0;
+        var shrink = size / this.shapes.length;
+        for (var i = 0, l = this.shapes.length; i < l; i++) {
+            var shape = this.shapes[i];
+            context.drawImage(shape.toImage(), offset, offset, size, size);
+            size -= shrink;
+            offset += Math.floor((shrink / 2));
         }
-        return this.options = n, this.canvas = p, this
+        this.options = options;
+        this.canvas = canvas;
+        return this;
     };
-    if (u.prototype = {
-            toDataURL: function(t) {
-                return t = t || "image/png", this.canvas.toDataURL(t)
-            },
-            toImage: function() {
-                var t = new l;
-                return t.src = this.toDataURL(), t
-            },
-            toCanvas: function() {
-                return this.canvas
-            },
-            toImageData: function() {
-                var t = this.canvas.getContext("2d"),
-                    n = t.getImageData(0, 0, this.options.size, this.options.size);
-                return n
-            }
-        }, "undefined" != typeof exports ? ("undefined" != typeof module && module.exports && (exports = module.exports = u), exports.Florash = u) : t.Florash = u, "undefined" != typeof document) u.createCanvas = function(t, n) {
-        var a = document.createElement("canvas");
-        return a.width = t, a.height = n, a
-    };
-    else try {
-        var c = require("canvas"),
-            l = c.Image;
-        u.createCanvas = function(t, n) {
-            var a = new c(t, n);
-            return a
+
+    Florash.prototype = {
+        toDataURL: function(type) {
+            type = type || 'image/png';
+            return this.canvas.toDataURL(type);
+        },
+        toImage: function() {
+            var image = Florash.createImage();
+            image.src = this.toDataURL();
+            return image;
+        },
+        toCanvas: function() {
+            return this.canvas;
+        },
+        toImageData: function() {
+            var context = this.canvas.getContext('2d');
+            var imageData = context.getImageData(0, 0, this.options.size, this.options.size);
+            return imageData;
         }
-    } catch (f) {
-        throw console.log(f), new Error("Cannot find canvas implementation.")
+    };
+
+
+
+    if (typeof exports !== 'undefined') {
+        if (typeof module !== 'undefined' && module.exports) {
+            exports = module.exports = Florash;
+        }
+        exports.Florash = Florash;
+    } else {
+        main.Florash = Florash;
     }
+
+    if (typeof document !== 'undefined') {
+        Florash.createCanvas = function(width, height) {
+            var canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            return canvas;
+        };
+
+        Florash.createImage = function() {
+            return new Image();
+        };
+    } else {
+        try {
+            var Canvas = require('canvas');
+            Florash.createCanvas = function(width, height) {
+                var canvas = new Canvas(width, height);
+                return canvas;
+            };
+            Florash.createImage = function() {
+                return new Canvas.Image();
+            };
+
+        } catch (E) {
+            console.log(E);
+            throw new Error('Cannot find canvas implementation.');
+        }
+
+    }
+
 }).call(this);
