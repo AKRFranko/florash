@@ -5,7 +5,7 @@
     var main = this;
     var TWO_PI = Math.PI * 2;
     var PHI = ((1 + Math.sqrt(5)) / 2);
-    n
+
 
     var createHSLString = function(h, s, l) {
         var hsl = 'hsl(' + (Math.floor(h) % 360) + ',' + (100 - (s % 100)) + '%,' + (100 - (l % 100)) + '%)';
