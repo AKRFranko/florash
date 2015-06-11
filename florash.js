@@ -5,7 +5,7 @@
     var main = this;
     var TWO_PI = Math.PI * 2;
     var PHI = ((1 + Math.sqrt(5)) / 2);
-    var Image = Image;
+    n
 
     var createHSLString = function(h, s, l) {
         var hsl = 'hsl(' + (Math.floor(h) % 360) + ',' + (100 - (s % 100)) + '%,' + (100 - (l % 100)) + '%)';
@@ -142,7 +142,7 @@
             return this.canvas.toDataURL(type);
         },
         toImage: function() {
-            var image = new Image();
+            var image = Florash.createImage();
             image.src = this.toDataURL();
             return image;
         },
@@ -207,7 +207,7 @@
             return this.canvas.toDataURL(type);
         },
         toImage: function() {
-            var image = new Image();
+            var image = Florash.createImage();
             image.src = this.toDataURL();
             return image;
         },
@@ -239,13 +239,19 @@
             canvas.height = height;
             return canvas;
         };
+
+        Florash.createImage = function() {
+            return new Image();
+        };
     } else {
         try {
             var Canvas = require('canvas');
-            Image = Canvas.Image;
             Florash.createCanvas = function(width, height) {
                 var canvas = new Canvas(width, height);
                 return canvas;
+            };
+            Florash.createImage = function() {
+                return new Canvas.Image();
             };
 
         } catch (E) {
