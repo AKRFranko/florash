@@ -1,0 +1,28 @@
+{
+  "name": "florash",
+  "version": "0.0.1",
+  "description": "The Florash is a beautiful and visually distinguishable representation of a 40 character hexadecimal string.",
+  "main": "florash.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "canvas",
+    "identicon",
+    "vash",
+    "visual",
+    "hash",
+    "browser",
+    "flowers",
+    "superformula"
+  ],
+  "author": "franko <code@akr.club> (http://akr.club)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AKRFranko/florash/issues"
+  },
+  "homepage": "https://github.com/AKRFranko/florash#readme",
+  "dependencies": {
+    "canvas": "^1.2.3"
+  }
+}

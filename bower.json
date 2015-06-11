@@ -1,0 +1,25 @@
+{
+    "name": "florash",
+    "main": "florash.js",
+    "version": "0.0.1",
+    "homepage": "\"visual\",",
+    "authors": [
+        "franko <code@akr.club> (http://akr.club)"
+    ],
+    "description": "The Florash is a beautiful and visually distinguishable representation of a 40 character hexadecimal string.",
+    "moduleType": [
+        "globals",
+        "node"
+    ],
+    "keywords": [
+        "canvas",
+        "identicon",
+        "vash",
+        "visual",
+        "hash",
+        "browser",
+        "flowers",
+        "superformula"
+    ],
+    "license": "ISC"
+}
