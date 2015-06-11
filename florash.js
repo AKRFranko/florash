@@ -104,6 +104,7 @@
     };
 
     var ShapeRenderer = function(options, points) {
+        options = options || {}
         var canvas = options.canvas || Florash.craeteCanvas(options.size || 256, options.size || 256);
         if (options instanceof Array) {
             points = options;
