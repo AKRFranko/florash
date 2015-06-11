@@ -158,6 +158,7 @@
     };
 
     var Florash = function(hash, options) {
+        options = options || {}
         var size = options.size || 256;
         var center = Math.floor(size / 2);
         var line = Math.floor((PHI / 100) * size);
