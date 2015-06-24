@@ -1,0 +1,38 @@
+#!/bin/env node
+
+var argv = require('minimist')(process.argv.slice(2));
+var sha1Hex = require('sha1-hex');
+var fs = require('fs');
+var Florash = require('../florash.js').Florash;
+
+
+if( argv.s ){
+  console.log('Using sha1 of string.')
+  argv.h = sha1Hex( argv.s );
+}
+if( argv.f ){
+  console.log('Using sha1 of file.')
+  var file = fs.readFileSync( argv.f );
+  argv.h = sha1Hex( file );
+}
+if( !argv.h ){
+  console.log('Using sha1 of timestamp.')
+  argv.h = sha1Hex(new Date().getTime())
+}
+
+if( !argv._ || argv._.length < 1){
+  console.log('Missing output file');
+}else{
+  var florash = new Florash( argv.h, {} );
+  var out = fs.createWriteStream( argv._[0] );
+  var stream = florash.toCanvas().pngStream();
+  stream.on('data', function(chunk){
+    out.write(chunk);
+  });
+
+  stream.on('end', function(){
+    console.log('saved png');
+  });
+  
+}
+
